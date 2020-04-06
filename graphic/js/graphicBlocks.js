@@ -198,13 +198,13 @@ Blockly.JavaScript['rotate'] = function (block) {
     }
 
     //rotuj vsekty objekty ak nemas potomka ani surroundparenta
-    if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) { }
-    else {
-        for (i = 0; i < scene.children.length; i++) {
-            if (!arrRotate.includes(scene.children[i].name))
-                arrRotate.push(scene.children[i].name);
-        }
-    }
+    // if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) { }
+    // else {
+    //     for (i = 0; i < scene.children.length; i++) {
+    //         if (!arrRotate.includes(scene.children[i].name))
+    //             arrRotate.push(scene.children[i].name);
+    //     }
+    // }
 
 
 
