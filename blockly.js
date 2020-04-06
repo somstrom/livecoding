@@ -164,8 +164,6 @@ function runCode(event) {
 
         arr.every(x => scene.remove(scene.getObjectByName(x)))
 
-        
-
     };
 
     console.log(blokyNaScene);
@@ -174,6 +172,7 @@ function runCode(event) {
     Object.keys(jumpObject).forEach(key => {
         jumpObject[key].volume(0.5);
         jumpObject[key].rate(1);
+        localStorage = 1;
         if (!blokyNaScene.includes(key)) {
             jumpObject[key].pause();
             // delete jumpObject[key];

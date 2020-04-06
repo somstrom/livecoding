@@ -192,7 +192,7 @@ Blockly.Blocks['delay'] = {
     init: function () {
         this.appendDummyInput()
             .appendField("delay")
-            .appendField(new Blockly.FieldNumber(0, 0, 10, 0.1), "delay");
+            .appendField(new Blockly.FieldNumber(1, 0, 10, 0.1), "delay");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour(0);
@@ -326,7 +326,7 @@ Blockly.JavaScript['delay'] = function (block) {
 
     //prednastav default delay
     Object.keys(jumpObject).forEach(key => {
-        localStorage[key] = 0;
+        localStorage[key] = 1;
     });
 
     var blok;
