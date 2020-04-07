@@ -105,7 +105,7 @@ Blockly.Blocks['scale'] = {
     init: function () {
         this.appendDummyInput()
             .appendField("Scale")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.5), "X");
+            .appendField(new Blockly.FieldNumber(0, 0, 2, 0.1), "X");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour(230);
@@ -217,7 +217,7 @@ Blockly.JavaScript['cone'] = function (block) {
 
 
     var code = '';
-    var name = this.id;
+    var name = this.id
 
     code += "if (scene.getObjectByName('" + name + "')){}"
         + "else"
@@ -231,6 +231,7 @@ Blockly.JavaScript['cone'] = function (block) {
 
 
     return code;
+
 };
 
 Blockly.JavaScript['circle'] = function (block) {
@@ -326,31 +327,48 @@ Blockly.JavaScript['move'] = function (block) {
     var number_y = block.getFieldValue('Y');
     var number_z = block.getFieldValue('Z');
 
-    // TODO: Assemble JavaScript into code variable.
+    // TODO: Assemble JavaScript into code variable;
 
     var blok;
 
-    if (this.getSurroundParent() != null) {
-        object = scene.getObjectByName(this.getSurroundParent().id);
-        object.position.set(number_x, number_y, number_z);
-    }
-    else if (this.getChildren()[0]) {
-        blok = this;
-        while (blok.nextConnection.targetConnection) {
-            if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
-                object = scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id);
-                object.position.set(number_x, number_y, number_z);
-            }
-            blok = blok.nextConnection.targetConnection.sourceBlock_;
+    if (number_x == number_y == number_z == 0) {
+        if (this.getSurroundParent() != null) {
+            arrMove.push(this.getSurroundParent().id);
+            scene.getObjectByName(this.getSurroundParent().id).scale.set(0.5,0.5,0.5)
         }
-    }
-    if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) { }
-    else {
-        for (i = 0; i < scene.children.length; i++) {
-            object = scene.getObjectByName(scene.children[i].name);
+        else if (this.getChildren()[0]) {
+            blok = this;
+            while (blok.nextConnection.targetConnection) {
+                if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
+                    arrMove.push(blok.nextConnection.targetConnection.sourceBlock_.id);
+                }
+                blok = blok.nextConnection.targetConnection.sourceBlock_;
+            }
+        }
+    } else {
+
+        if (this.getSurroundParent() != null) {
+            object = scene.getObjectByName(this.getSurroundParent().id);
             object.position.set(number_x, number_y, number_z);
         }
+        else if (this.getChildren()[0]) {
+            blok = this;
+            while (blok.nextConnection.targetConnection) {
+                if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
+                    object = scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id);
+                    object.position.set(number_x, number_y, number_z);
+                }
+                blok = blok.nextConnection.targetConnection.sourceBlock_;
+            }
+        }
     }
+    // if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) { }
+    // else {
+    //     for (i = 0; i < scene.children.length; i++) {
+    //         object = scene.getObjectByName(scene.children[i].name);
+    //         object.position.set(number_x, number_y, number_z);
+    //     }
+    // }
 
     var code = '';
     return code;
@@ -360,7 +378,36 @@ Blockly.JavaScript['scale'] = function (block) {
 
     var number_x = block.getFieldValue('X');
 
-    // TODO: Assemble JavaScript into code variable.
+    if (number_x == 0) {
+        if (this.getSurroundParent() != null) {
+            arrScale.push(this.getSurroundParent().id);
+        }
+        else if (this.getChildren()[0]) {
+            blok = this;
+            while (blok.nextConnection.targetConnection) {
+                if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
+                    arrScale.push(blok.nextConnection.targetConnection.sourceBlock_.id);
+                }
+                blok = blok.nextConnection.targetConnection.sourceBlock_;
+            }
+        }
+    } else {
+
+        if (this.getSurroundParent() != null) {
+            object = scene.getObjectByName(this.getSurroundParent().id);
+            object.scale.set(number_x, number_x, number_x);
+        }
+        else if (this.getChildren()[0]) {
+            blok = this;
+            while (blok.nextConnection.targetConnection) {
+                if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
+                    object = scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id);
+                    object.scale.set(number_x, number_x, number_x);
+                }
+                blok = blok.nextConnection.targetConnection.sourceBlock_;
+            }
+        }
+    }
 
     var code = '';
     return code;

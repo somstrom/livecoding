@@ -23,6 +23,8 @@ var renderer;
 var stopRendering;
 var cube;
 var arrRotate = [];
+var arrMove = [];
+var arrScale = [];
 var controls;
 
 var requestId;
@@ -72,12 +74,41 @@ function init() {
 init();
 
 function rotate(object) {
-
     object.rotation.x += 0.02;
     object.rotation.y += 0.02;
-
 }
 
+// var t = 0;
+var clock = new THREE.Clock();
+var time = 0;
+var radius = 1;
+
+function move(object) {
+    time = clock.getElapsedTime() * 0.5 * Math.PI;
+    object.position.set(
+        Math.cos(time + Math.PI * 0.5) * radius,
+        Math.sin(time + Math.PI * 0.5) * radius,
+        Math.sin(time + Math.PI * 0.25) * radius
+    )
+    // console.log(object)
+    // object.position.x = 20*Math.cos(t) + 0;
+    // object.position.z = 20*Math.sin(t) + 0
+}
+
+var num = 1;
+var n = 1;
+function scale(object){
+
+    if(num < -1) num = 1;
+
+    num -= 0.02;
+
+    console.log(num)
+
+    object.scale.set(
+        num, num, num
+    )
+}
 
 var i;
 
@@ -86,6 +117,21 @@ function render() {
     if (arrRotate.length > 0) {
         for (i = 0; i < arrRotate.length; i++) {
             rotate(scene.getObjectByName(arrRotate[i]));
+        }
+    }
+
+    if (arrMove.length > 0) {
+        // console.log(arrMove[0])
+        for (i = 0; i < arrMove.length; i++) {
+            move(scene.getObjectByName(arrMove[i]));
+        }
+    }
+
+    if (arrScale.length > 0) {
+        // console.log(arrMove[0])
+        for (i = 0; i < arrScale.length; i++) {
+            scale(scene.getObjectByName(arrScale[i]));
+            console.log("scale")
         }
     }
 
@@ -147,7 +193,7 @@ function runCode(event) {
     }else{
         for (i = 0; i < workspace.getAllBlocks().length; i++) {
             blokyNaScene[i] = workspace.getAllBlocks()[i].id;
-            console.log(workspace.getAllBlocks())
+            // console.log(workspace.getAllBlocks())
         }
     }
 
@@ -160,13 +206,16 @@ function runCode(event) {
             if (arrRotate.includes(e)) {
                 arrRotate = arrRotate.filter(x => x != e);
             }
+            if (arrMove.includes(e)){
+                arrMove = arrMove.filter(x => x != e);
+            }
         })
 
         arr.every(x => scene.remove(scene.getObjectByName(x)))
 
     };
 
-    console.log(blokyNaScene);
+    // console.log(blokyNaScene);
 
     //zastav 2x pustene zvuky
     Object.keys(jumpObject).forEach(key => {
@@ -188,10 +237,13 @@ function runCode(event) {
             Blockly.JavaScript.INFINITE_LOOP_TRAP =
                 'if (--window.LoopTrap == 0) throw "Infinite loop.";\n';
             arrRotate = [];
+            arrMove = [];
+            arrScale = [];
 
             for (i = 0; i < scene.children.length; i++) {
                 var obj = scene.getObjectByName(scene.children[i].name);
                 obj.position.set(0, 0, 0);
+                obj.scale.set(1 ,1 , 1);
             }
 
             var code = Blockly.JavaScript.workspaceToCode(workspace);
