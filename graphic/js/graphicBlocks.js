@@ -1,3 +1,4 @@
+
 //Box block
 Blockly.Blocks['box'] = {
     init: function () {
@@ -334,7 +335,7 @@ Blockly.JavaScript['move'] = function (block) {
     if (number_x == number_y == number_z == 0) {
         if (this.getSurroundParent() != null) {
             arrMove.push(this.getSurroundParent().id);
-            scene.getObjectByName(this.getSurroundParent().id).scale.set(0.5,0.5,0.5)
+            // scene.getObjectByName(this.getSurroundParent().id).scale.set(0.5,0.5,0.5)
         }
         else if (this.getChildren()[0]) {
             blok = this;

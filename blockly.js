@@ -37,6 +37,7 @@ var blokyNaScene = [];
 var element = document.getElementById("scene");
 
 
+
 function init() {
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -70,7 +71,6 @@ function init() {
     render();
 }
 
-
 init();
 
 function rotate(object) {
@@ -96,17 +96,19 @@ function move(object) {
 }
 
 var num = 1;
-var n = 1;
+
 function scale(object){
 
     if(num < -1) num = 1;
 
     num -= 0.02;
+    time = clock.getElapsedTime() * 0.5 * Math.PI
+    console.log(time + Math.PI * 0.5)
 
-    console.log(num)
+    // console.log(num)
 
     object.scale.set(
-        num, num, num
+        Math.abs(num), Math.abs(num), Math.abs(num)
     )
 }
 
@@ -134,6 +136,8 @@ function render() {
             console.log("scale")
         }
     }
+
+    // findPeaks();
 
     renderer.render(scene, camera);
 

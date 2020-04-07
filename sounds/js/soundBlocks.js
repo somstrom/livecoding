@@ -86,14 +86,14 @@ Blockly.JavaScript['jump'] = function (block) {
             loop: true,
             volume: 0.5,
             onend: () => {
-                    jumpObject[this.id].pause();
-                    timer = setTimeout(() => {
-                        if (blokyNaScene.includes(this.id)) {
-                            jumpObject[this.id].play();
-                        }
-                    }, localStorage[this.id] * 1000);
-                }
+                jumpObject[this.id].pause();
+                timer = setTimeout(() => {
+                    if (blokyNaScene.includes(this.id)) {
+                        jumpObject[this.id].play();
+                    }
+                }, localStorage[this.id] * 1000);
             }
+        }
         )
         jumpObject[this.id].play();
     }
@@ -116,16 +116,18 @@ Blockly.JavaScript['80svibe'] = function (block) {
             loop: true,
             volume: 0.5,
             onend: () => {
-                    jumpObject[this.id].pause();
-                    timer = setTimeout(() => {
-                        if (blokyNaScene.includes(this.id)) {
-                            jumpObject[this.id].play();
-                        }
-                    }, localStorage[this.id] * 1000);
-                }
+                jumpObject[this.id].pause();
+                timer = setTimeout(() => {
+                    if (blokyNaScene.includes(this.id)) {
+                        jumpObject[this.id].play();
+                    }
+                }, localStorage[this.id] * 1000);
             }
+        }
         )
         jumpObject[this.id].play();
+
+        console.log(jumpObject[this.id])
     }
 
     return code;
@@ -146,14 +148,14 @@ Blockly.JavaScript['collision'] = function (block) {
             loop: true,
             volume: 0.5,
             onend: () => {
-                    jumpObject[this.id].pause();
-                    timer = setTimeout(() => {
-                        if (blokyNaScene.includes(this.id)) {
-                            jumpObject[this.id].play();
-                        }
-                    }, localStorage[this.id] * 1000);
-                }
+                jumpObject[this.id].pause();
+                timer = setTimeout(() => {
+                    if (blokyNaScene.includes(this.id)) {
+                        jumpObject[this.id].play();
+                    }
+                }, localStorage[this.id] * 1000);
             }
+        }
         )
         jumpObject[this.id].play();
     }
@@ -354,4 +356,4 @@ Blockly.JavaScript['delay'] = function (block) {
 
     var code = '';
     return code;
-};
+}
