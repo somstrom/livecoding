@@ -212,15 +212,15 @@ Blockly.JavaScript['volume'] = function (block) {
     var code = '';
     var blok;
 
-    if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) {
-    }
-    else {
-        //vsetci volume globalne
-        Object.keys(jumpObject).forEach(key => {
-            jumpObject[key].volume(volume);
-        });
-        return code;
-    }
+    // if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) {
+    // }
+    // else {
+    //     //vsetci volume globalne
+    //     Object.keys(jumpObject).forEach(key => {
+    //         jumpObject[key].volume(volume);
+    //     });
+    //     return code;
+    // }
 
     if (this.getSurroundParent() != null) {
         //surrounded blok
@@ -272,13 +272,13 @@ Blockly.JavaScript['rate'] = function (block) {
             blok = blok.nextConnection.targetConnection.sourceBlock_;
         }
     }
-    if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) { }
-    else {
-        //vsetci globalne
-        Object.keys(jumpObject).forEach(key => {
-            jumpObject[key].rate(rate);
-        });
-    }
+    // if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) { }
+    // else {
+    //     //vsetci globalne
+    //     Object.keys(jumpObject).forEach(key => {
+    //         jumpObject[key].rate(rate);
+    //     });
+    // }
 
     var code = '';
     return code;
@@ -344,13 +344,13 @@ Blockly.JavaScript['delay'] = function (block) {
             blok = blok.nextConnection.targetConnection.sourceBlock_;
         }
     }
-    if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) { }
-    else {
-        //vsetci globalne
-        Object.keys(jumpObject).forEach(key => {
-            localStorage[key] = delay;
-        });
-    }
+    // if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) { }
+    // else {
+    //     //vsetci globalne
+    //     Object.keys(jumpObject).forEach(key => {
+    //         localStorage[key] = delay;
+    //     });
+    // }
 
     var code = '';
     return code;
