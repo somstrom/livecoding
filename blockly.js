@@ -40,15 +40,17 @@ var element = document.getElementById("scene");
 
 function init() {
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setClearColor("#fff");
-    renderer.setSize(window.innerWidth, window.innerHeight * 0.7);
+    renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer.setClearColor( 0x000000, 0 );;
+    renderer.setSize(window.innerWidth, window.innerHeight) ;
     element.appendChild(renderer.domElement);
+    console.log(element);
+    element.childNodes[0].style.background = 'transparent'
 
     scene = new THREE.Scene();
 
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
-    // controls = new THREE.OrbitControls(camera,renderer.domElement);
+    camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 10000);
+    controls = new THREE.OrbitControls(camera,renderer.domElement);
 
     // controls = new THREE.OrbitControls( camera, render.domElement );
 
@@ -57,11 +59,13 @@ function init() {
     //looks in the center of the scene since that where we always sstart when creating a scene
     camera.lookAt(scene.position);
 
+    controls.update();
+
     // document.body.appendChild(renderer.domElement);
     // controls = new THREE.OrbitControls(camera, renderer.domElement);
 
     window.addEventListener('resize', () => {
-        renderer.setSize(window.innerWidth, window.innerHeight * 0.7);
+        renderer.setSize(window.innerWidth, window.innerHeight);
         camera.aspect = window.innerWidth / window.innerHeight;
 
         camera.updateProjectionMatrix();
@@ -84,31 +88,35 @@ var time = 0;
 var radius = 1;
 
 function move(object) {
-    time = clock.getElapsedTime() * 0.5 * Math.PI;
-    object.position.set(
-        Math.cos(time + Math.PI * 0.5) * radius,
-        Math.sin(time + Math.PI * 0.5) * radius,
-        Math.sin(time + Math.PI * 0.25) * radius
-    )
     // console.log(object)
-    // object.position.x = 20*Math.cos(t) + 0;
-    // object.position.z = 20*Math.sin(t) + 0
+    time = clock.getElapsedTime() * 0.5 * Math.PI;
+    // console.log(time * 0.5 * Math.PI)
+    // console.log(Math.cos(time + Math.PI * 0.5) * radius)
+    scene.getObjectByName(object[0]).position.set(
+        Math.cos(1.2*object[1] + time + Math.PI * 0.5) * radius,
+        Math.sin(1.2*object[1] +time + Math.PI * 0.5) * radius,
+        Math.cos(1.2*object[1] +time + Math.PI * 0.25) * radius
+    )
 }
 
-var num = 1;
+// function move(object){
+//     console.log()
+//     object.position.x += Math.cos(Math.PI * 0.5) * radius;
+//     object.position.y += Math.sin(Math.PI * 0.5) * radius;
+// }
 
 function scale(object){
-
-    if(num < -1) num = 1;
-
-    num -= 0.02;
-    time = clock.getElapsedTime() * 0.5 * Math.PI
-    console.log(time + Math.PI * 0.5)
-
-    // console.log(num)
-
-    object.scale.set(
-        Math.abs(num), Math.abs(num), Math.abs(num)
+    time = clock.getElapsedTime() * 0.5 * Math.PI;
+    // object.scale.set(
+    //     Math.sin(time + Math.PI * 0.5) * radius,
+    //     Math.sin(time + Math.PI * 0.5) * radius,
+    //     Math.sin(time + Math.PI * 0.5) * radius
+    // )
+    console.log(Math.sin(1.2*object[1] + time + Math.PI * 0.5) * radius)
+    scene.getObjectByName(object[0]).scale.set(
+        Math.abs(Math.sin(1.2*object[1] + time + Math.PI * 0.5) * radius),
+        Math.abs(Math.sin(1.2*object[1] + time + Math.PI * 0.5) * radius),
+        Math.abs(Math.sin(1.2*object[1] + time + Math.PI * 0.5) * radius)
     )
 }
 
@@ -124,20 +132,23 @@ function render() {
 
     if (arrMove.length > 0) {
         // console.log(arrMove[0])
+        console.log(arrMove)
         for (i = 0; i < arrMove.length; i++) {
-            move(scene.getObjectByName(arrMove[i]));
+            // move(scene.getObjectByName(arrMove[i][0]));
+            move(arrMove[i]);
         }
     }
 
     if (arrScale.length > 0) {
         // console.log(arrMove[0])
         for (i = 0; i < arrScale.length; i++) {
-            scale(scene.getObjectByName(arrScale[i]));
-            console.log("scale")
+            scale(arrScale[i]);
         }
     }
 
     // findPeaks();
+
+    controls.update();
 
     renderer.render(scene, camera);
 

@@ -334,14 +334,14 @@ Blockly.JavaScript['move'] = function (block) {
 
     if (number_x == number_y == number_z == 0) {
         if (this.getSurroundParent() != null) {
-            arrMove.push(this.getSurroundParent().id);
+            arrMove.push([this.getSurroundParent().id,arrMove.length+1]);
             // scene.getObjectByName(this.getSurroundParent().id).scale.set(0.5,0.5,0.5)
         }
         else if (this.getChildren()[0]) {
             blok = this;
             while (blok.nextConnection.targetConnection) {
                 if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
-                    arrMove.push(blok.nextConnection.targetConnection.sourceBlock_.id);
+                    arrMove.push([blok.nextConnection.targetConnection.sourceBlock_.id,arrMove.length+1]);
                 }
                 blok = blok.nextConnection.targetConnection.sourceBlock_;
             }
@@ -381,13 +381,13 @@ Blockly.JavaScript['scale'] = function (block) {
 
     if (number_x == 0) {
         if (this.getSurroundParent() != null) {
-            arrScale.push(this.getSurroundParent().id);
+            arrScale.push([this.getSurroundParent().id,arrScale.length+1]);
         }
         else if (this.getChildren()[0]) {
             blok = this;
             while (blok.nextConnection.targetConnection) {
                 if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
-                    arrScale.push(blok.nextConnection.targetConnection.sourceBlock_.id);
+                    arrScale.push([blok.nextConnection.targetConnection.sourceBlock_.id,arrScale.length+1]);
                 }
                 blok = blok.nextConnection.targetConnection.sourceBlock_;
             }
