@@ -85,17 +85,21 @@ function rotate(object) {
 // var t = 0;
 var clock = new THREE.Clock();
 var time = 0;
-var radius = 1;
+var radius = 1.5;
 
-function move(object) {
-    // console.log(object)
+function move(object,n) {
+
+    var number = 0
+    if(n){
+        number = n;
+    }
+
     time = clock.getElapsedTime() * 0.5 * Math.PI;
-    // console.log(time * 0.5 * Math.PI)
-    // console.log(Math.cos(time + Math.PI * 0.5) * radius)
-    scene.getObjectByName(object[0]).position.set(
-        Math.cos(1.2*object[1] + time + Math.PI * 0.5) * radius,
-        Math.sin(1.2*object[1] +time + Math.PI * 0.5) * radius,
-        Math.cos(1.2*object[1] +time + Math.PI * 0.25) * radius
+    console.log(Math.cos(number*1.2 + time+Math.PI*0.5))
+    object.position.set(
+        Math.cos(number*0.8 + time + Math.PI * 0.5) * radius,
+        Math.sin(number*0.8 + time + Math.PI * 0.5) * radius,
+        Math.cos(number*0.8 + time + Math.PI * 0.25) * radius
     )
 }
 
@@ -112,11 +116,10 @@ function scale(object){
     //     Math.sin(time + Math.PI * 0.5) * radius,
     //     Math.sin(time + Math.PI * 0.5) * radius
     // )
-    console.log(Math.sin(1.2*object[1] + time + Math.PI * 0.5) * radius)
-    scene.getObjectByName(object[0]).scale.set(
-        Math.abs(Math.sin(1.2*object[1] + time + Math.PI * 0.5) * radius),
-        Math.abs(Math.sin(1.2*object[1] + time + Math.PI * 0.5) * radius),
-        Math.abs(Math.sin(1.2*object[1] + time + Math.PI * 0.5) * radius)
+    object.scale.set(
+        Math.abs(Math.sin(time + Math.PI * 0.5) * radius),
+        Math.abs(Math.sin(time + Math.PI * 0.5) * radius),
+        Math.abs(Math.sin(time + Math.PI * 0.5) * radius)
     )
 }
 
@@ -126,23 +129,37 @@ function render() {
 
     if (arrRotate.length > 0) {
         for (i = 0; i < arrRotate.length; i++) {
-            rotate(scene.getObjectByName(arrRotate[i]));
+            objektyNaScene.forEach((x)=>{
+                if(arrRotate[i] == x.name.slice(0,20)){
+                    rotate(scene.getObjectByName(x.name),x.name[20])
+                }
+            })
+            // rotate(scene.getObjectByName(arrRotate[i]));
         }
     }
 
     if (arrMove.length > 0) {
         // console.log(arrMove[0])
-        console.log(arrMove)
         for (i = 0; i < arrMove.length; i++) {
+            objektyNaScene.forEach((x)=>{
+                if(arrMove[i] == x.name.slice(0,20)){
+                    move(scene.getObjectByName(x.name),x.name[20])
+                }
+            })
             // move(scene.getObjectByName(arrMove[i][0]));
-            move(arrMove[i]);
+            // move(arrMove[i]);
         }
     }
 
     if (arrScale.length > 0) {
         // console.log(arrMove[0])
         for (i = 0; i < arrScale.length; i++) {
-            scale(arrScale[i]);
+            objektyNaScene.forEach((x)=>{
+                if(arrScale[i] == x.name.slice(0,20)){
+                    scale(scene.getObjectByName(x.name),)
+                }
+            })
+            // scale(arrScale[i]);
         }
     }
 
@@ -180,13 +197,14 @@ window.addEventListener('resize', onresize, false);
 onresize();
 Blockly.svgResize(workspace);
 
-
+var objektyNaScene;
 
 function runCode(event) {
 
+    objektyNaScene = scene.children;
+
     //pre kazdy objekt pozriet ci existuje block ak nie prec
     //vsetky objekty
-    var objektyNaScene = scene.children;
     //vsetky bloky
 
     //vymaz objekty naviac
@@ -198,7 +216,7 @@ function runCode(event) {
     // })
 
     for (i = 0; i < objektyNaScene.length; i++) {
-        if (!blokyNaScene.includes(objektyNaScene[i].name)) {
+        if (!blokyNaScene.includes(objektyNaScene[i].name) && objektyNaScene[i].name.length == 20) {
             scene.remove(scene.getObjectByName(objektyNaScene[i].name));
         }
     }
@@ -216,6 +234,12 @@ function runCode(event) {
 
         arr = [];
         arr = event.ids;
+
+        for( var i = scene.children.length - 1; i >= 0; i--) {
+            if (!blokyNaScene.includes(scene.children[i].name)) {
+                scene.remove(scene.getObjectByName(scene.children[i].name));
+            }
+        }
 
         arr.every(e => {
             if (arrRotate.includes(e)) {

@@ -35,5 +35,6 @@ table {
 
 .blocklyBlockCanvas, .blocklyBlockTrash, .blocklyToolboxDiv{
   pointer-events: auto;
+  opacity: 1;
 }
 

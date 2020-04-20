@@ -130,6 +130,35 @@ Blockly.Blocks['colour'] = {
     }
 };
 
+Blockly.Blocks['repeat'] = {
+    init: function () {
+        this.appendDummyInput()
+            .appendField(new Blockly.FieldLabelSerializable("repeat"), "repeat")
+            .appendField(new Blockly.FieldNumber(1, 1, 100, 1), "number")
+            .appendField(new Blockly.FieldLabelSerializable("times"), "times");
+        this.appendStatementInput("NAME")
+            .setCheck(null)
+            .appendField("do");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour(230);
+        this.setTooltip("");
+        this.setHelpUrl("");
+    }
+};
+
+
+Blockly.JavaScript['repeat'] = function (block) {
+    var number = block.getFieldValue('number');
+    var statements_name = Blockly.JavaScript.statementToCode(block, 'NAME');
+
+    var code = '';
+
+
+
+    return code;
+};
+
 //The generator function takes a reference to the block for processing. It renders the inputs (the VALUE input, above) into code strings, and then concatenates those into a larger expression.
 Blockly.JavaScript['box'] = function (block) {
 
@@ -137,21 +166,85 @@ Blockly.JavaScript['box'] = function (block) {
 
     var code = '';
     var name = this.id;
+    var repeat_number = 1;
+    var repeat_name = '';
 
-    console.log(name);
+    if (parent = this.getSurroundParent()) {
+        if (parent.type == "repeat") {
+            repeat_number = parent.inputList[0].fieldRow[1].value_;
+            repeat_name = parent.id;
 
-    code += "if (scene.getObjectByName('" + name + "')){}"
-        + "else"
-        + "{var geometry = new THREE.BoxGeometry(1,1,1);"
-        // + "var material = new THREE.MeshBasicMaterial({ color: 0x333333 });"
-        + "var material = new THREE.MeshNormalMaterial();"
-        + "var cube = new THREE.Mesh(geometry, material);"
-        + "cube.name = '" + name + "';"
-        + "scene.add(cube);"
-        + "cube.rotation.set(0.5,1,0);}";
+            for (var i = scene.children.length - 1; i >= 0; i--) {
+                if (scene.children[i].name.includes(name) && scene.children[i].name[20] > repeat_number-1) {
+                    scene.remove(scene.getObjectByName(scene.children[i].name))
+                }
+            }
+
+        }
+
+    } else {
+        for (var i = scene.children.length - 1; i >= 0; i--) {
+            if (scene.children[i].name.includes(name) && scene.children[i].name.length > 20) {
+                scene.remove(scene.getObjectByName(scene.children[i].name))
+            }
+        }
+    }
+
+    if (scene.getObjectByName(name)) { }
+    else {
+        var geometry = new THREE.BoxGeometry(1, 1, 1);
+        var material = new THREE.MeshNormalMaterial();
+        var cube = new THREE.Mesh(geometry, material);
+        cube.name = name;
+        scene.add(cube);
+        cube.rotation.set(1, 1, 1);
+    }
+
+    for (i = 1; i < repeat_number; i++) {
+        if (scene.getObjectByName(name + i)) { }
+        else {
+            var geometry = new THREE.BoxGeometry(1, 1, 1);
+            var material = new THREE.MeshNormalMaterial();
+            var cube = new THREE.Mesh(geometry, material);
+            cube.name = name + i;
+            scene.add(cube);
+            cube.rotation.set(i + 1, i + 1, i + 1);
+        }
+    }
+
+    // code += "if (scene.getObjectByName('" + name + "')){}"
+    //     + "else"
+    //     + "{var geometry = new THREE.BoxGeometry(1,1,1);"
+    //     // + "var material = new THREE.MeshBasicMaterial({ color: 0x333333 });"
+    //     + "var material = new THREE.MeshNormalMaterial();"
+    //     + "var cube = new THREE.Mesh(geometry, material);"
+    //     + "cube.name = '" + name + "';"
+    //     + "scene.add(cube);"
+    //     + "cube.rotation.set(0.5,1,0);}";
 
     return code;
 };
+
+// Blockly.JavaScript['box'] = function (block) {
+
+//     var statements_box = Blockly.JavaScript.statementToCode(block, 'Box');
+
+//     var code = '';
+//     var name = this.id;
+
+//     code += "if (scene.getObjectByName('" + name + "')){}"
+//         + "else"
+//         + "{var geometry = new THREE.BoxGeometry(1,1,1);"
+//         // + "var material = new THREE.MeshBasicMaterial({ color: 0x333333 });"
+//         + "var material = new THREE.MeshNormalMaterial();"
+//         + "var cube = new THREE.Mesh(geometry, material);"
+//         + "cube.name = '" + name + "';"
+//         + "scene.add(cube);"
+//         + "cube.rotation.set(0.5,1,0);}";
+
+//     return code;
+// };
+
 
 Blockly.JavaScript['ball'] = function (block) {
 
@@ -159,18 +252,75 @@ Blockly.JavaScript['ball'] = function (block) {
 
     var code = '';
     var name = this.id;
+    var repeat_number = 1;
+    var repeat_name = '';
 
-    code += "if (scene.getObjectByName('" + name + "')){}"
-        + "else"
-        + "{var geometry = new THREE.DodecahedronBufferGeometry(1,2);"
-        // + "var material = new THREE.MeshBasicMaterial({ color: 0x333333 });"
-        + "var material = new THREE.MeshNormalMaterial();"
-        + "var ball = new THREE.Mesh(geometry, material);"
-        + "ball.name = '" + name + "';"
-        + "scene.add(ball);"
-        + "ball.rotation.set(0.5,0.5,0);}";
+    if (parent = this.getSurroundParent()) {
+        if (parent.type == "repeat") {
+            repeat_number = parent.inputList[0].fieldRow[1].value_;
+            repeat_name = parent.id;
+
+            for (var i = scene.children.length - 1; i >= 0; i--) {
+                if (scene.children[i].name.includes(name) && scene.children[i].name[20] > repeat_number-1) {
+                    scene.remove(scene.getObjectByName(scene.children[i].name))
+                }
+            }
+
+        }
+
+    } else {
+        for (var i = scene.children.length - 1; i >= 0; i--) {
+            if (scene.children[i].name.includes(name) && scene.children[i].name.length > 20) {
+                scene.remove(scene.getObjectByName(scene.children[i].name))
+            }
+        }
+    }
+
+    if (scene.getObjectByName(name)) { }
+    else {
+        var geometry = new THREE.DodecahedronBufferGeometry(1, 2);
+            var material = new THREE.MeshNormalMaterial();
+            var ball = new THREE.Mesh(geometry, material);
+            ball.name = name;
+            scene.add(ball);
+            ball.rotation.set(i + 1, i + 1, i + 1);
+    }
+
+    for (i = 1; i < repeat_number; i++) {
+        if (scene.getObjectByName(name + i)) { }
+        else {
+            var geometry = new THREE.DodecahedronBufferGeometry(1, 2);
+            var material = new THREE.MeshNormalMaterial();
+            var ball = new THREE.Mesh(geometry, material);
+            ball.name = name + i;
+            scene.add(ball);
+            ball.rotation.set(i + 1, i + 1, i + 1);
+        }
+    }
+
+    // code += "if (scene.getObjectByName('" + name + "')){}"
+    //     + "else"
+    //     + "{var geometry = new THREE.BoxGeometry(1,1,1);"
+    //     // + "var material = new THREE.MeshBasicMaterial({ color: 0x333333 });"
+    //     + "var material = new THREE.MeshNormalMaterial();"
+    //     + "var cube = new THREE.Mesh(geometry, material);"
+    //     + "cube.name = '" + name + "';"
+    //     + "scene.add(cube);"
+    //     + "cube.rotation.set(0.5,1,0);}";
 
     return code;
+
+    // code += "if (scene.getObjectByName('" + name + "')){}"
+    //     + "else"
+    //     + "{var geometry = new THREE.DodecahedronBufferGeometry(1,2);"
+    //     // + "var material = new THREE.MeshBasicMaterial({ color: 0x333333 });"
+    //     + "var material = new THREE.MeshNormalMaterial();"
+    //     + "var ball = new THREE.Mesh(geometry, material);"
+    //     + "ball.name = '" + name + "';"
+    //     + "scene.add(ball);"
+    //     + "ball.rotation.set(0.5,0.5,0);}";
+
+    // return code;
 };
 
 Blockly.JavaScript['rotate'] = function (block) {
@@ -182,7 +332,7 @@ Blockly.JavaScript['rotate'] = function (block) {
     // console.log(this.nextConnection);
 
     //rotuj objekt ktoreho blok ta obklopuje
-    if (this.getSurroundParent() != null) {
+    if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
         if (!arrRotate.includes(this.getSurroundParent().id))
             arrRotate.push(this.getSurroundParent().id);
     } else if (this.getChildren()[0]) {
@@ -218,17 +368,62 @@ Blockly.JavaScript['cone'] = function (block) {
 
 
     var code = '';
-    var name = this.id
+    var name = this.id;
+    var repeat_number = 1;
+    var repeat_name = '';
 
-    code += "if (scene.getObjectByName('" + name + "')){}"
-        + "else"
-        + "{var geometry = new THREE.ConeGeometry(1,2);"
-        // + "var material = new THREE.MeshBasicMaterial({ color: 0x333333 });"
-        + "var material = new THREE.MeshNormalMaterial();"
-        + "var cone = new THREE.Mesh(geometry, material);"
-        + "cone.name = '" + name + "';"
-        + "scene.add(cone);"
-        + "cone.rotation.set(0.5,0.5,0);}";
+    if (parent = this.getSurroundParent()) {
+        if (parent.type == "repeat") {
+            repeat_number = parent.inputList[0].fieldRow[1].value_;
+            repeat_name = parent.id;
+
+            for (var i = scene.children.length - 1; i >= 0; i--) {
+                if (scene.children[i].name.includes(name) && scene.children[i].name[20] > repeat_number-1) {
+                    scene.remove(scene.getObjectByName(scene.children[i].name))
+                }
+            }
+
+        }
+
+    } else {
+        for (var i = scene.children.length - 1; i >= 0; i--) {
+            if (scene.children[i].name.includes(name) && scene.children[i].name.length > 20) {
+                scene.remove(scene.getObjectByName(scene.children[i].name))
+            }
+        }
+    }
+
+    if (scene.getObjectByName(name)) { }
+    else {
+        var geometry = new THREE.ConeGeometry(1,2);
+            var material = new THREE.MeshNormalMaterial();
+            var cone = new THREE.Mesh(geometry, material);
+            cone.name = name;
+            scene.add(cone);
+            cone.rotation.set(i + 1, i + 1, i + 1);
+    }
+
+    for (i = 1; i < repeat_number; i++) {
+        if (scene.getObjectByName(name + i)) { }
+        else {
+            var geometry = new THREE.ConeGeometry(1,2);
+            var material = new THREE.MeshNormalMaterial();
+            var cone = new THREE.Mesh(geometry, material);
+            cone.name = name + i;
+            scene.add(cone);
+            cone.rotation.set(i + 1, i + 1, i + 1);
+        }
+    }
+
+    // code += "if (scene.getObjectByName('" + name + "')){}"
+    //     + "else"
+    //     + "{var geometry = new THREE.ConeGeometry(1,2);"
+    //     // + "var material = new THREE.MeshBasicMaterial({ color: 0x333333 });"
+    //     + "var material = new THREE.MeshNormalMaterial();"
+    //     + "var cone = new THREE.Mesh(geometry, material);"
+    //     + "cone.name = '" + name + "';"
+    //     + "scene.add(cone);"
+    //     + "cone.rotation.set(0.5,0.5,0);}";
 
 
     return code;
@@ -241,16 +436,61 @@ Blockly.JavaScript['circle'] = function (block) {
 
     var code = '';
     var name = this.id;
+    var repeat_number = 1;
+    var repeat_name = '';
 
-    code += "if (scene.getObjectByName('" + name + "')){}"
-        + "else"
-        + "{var geometry = new THREE.CircleGeometry(1,30);"
-        // + "var material = new THREE.MeshBasicMaterial({ color: 0x333333 });"
-        + "var material = new THREE.MeshNormalMaterial();"
-        + "var circle = new THREE.Mesh(geometry, material);"
-        + "circle.name = '" + name + "';"
-        + "scene.add(circle);}";
-    // + "circle.rotation.set(0.5,0.5,0);}";
+    if (parent = this.getSurroundParent()) {
+        if (parent.type == "repeat") {
+            repeat_number = parent.inputList[0].fieldRow[1].value_;
+            repeat_name = parent.id;
+
+            for (var i = scene.children.length - 1; i >= 0; i--) {
+                if (scene.children[i].name.includes(name) && scene.children[i].name[20] > repeat_number-1) {
+                    scene.remove(scene.getObjectByName(scene.children[i].name))
+                }
+            }
+
+        }
+
+    } else {
+        for (var i = scene.children.length - 1; i >= 0; i--) {
+            if (scene.children[i].name.includes(name) && scene.children[i].name.length > 20) {
+                scene.remove(scene.getObjectByName(scene.children[i].name))
+            }
+        }
+    }
+
+    if (scene.getObjectByName(name)) { }
+    else {
+        var geometry = new THREE.CircleGeometry(1,30);
+            var material = new THREE.MeshNormalMaterial();
+            var circle = new THREE.Mesh(geometry, material);
+            circle.name = name;
+            scene.add(circle);
+            circle.rotation.set(i + 1, i + 1, i + 1);
+    }
+
+    for (i = 1; i < repeat_number; i++) {
+        if (scene.getObjectByName(name + i)) { }
+        else {
+            var geometry = new THREE.CircleGeometry(1,30);
+            var material = new THREE.MeshNormalMaterial();
+            var circle = new THREE.Mesh(geometry, material);
+            circle.name = name + i;
+            scene.add(circle);
+            circle.rotation.set(i + 1, i + 1, i + 1);
+        }
+    }
+
+    // code += "if (scene.getObjectByName('" + name + "')){}"
+    //     + "else"
+    //     + "{var geometry = new THREE.CircleGeometry(1,30);"
+    //     // + "var material = new THREE.MeshBasicMaterial({ color: 0x333333 });"
+    //     + "var material = new THREE.MeshNormalMaterial();"
+    //     + "var circle = new THREE.Mesh(geometry, material);"
+    //     + "circle.name = '" + name + "';"
+    //     + "scene.add(circle);}";
+    // // + "circle.rotation.set(0.5,0.5,0);}";
 
     return code;
 };
@@ -328,20 +568,25 @@ Blockly.JavaScript['move'] = function (block) {
     var number_y = block.getFieldValue('Y');
     var number_z = block.getFieldValue('Z');
 
+
     // TODO: Assemble JavaScript into code variable;
 
     var blok;
 
-    if (number_x == number_y == number_z == 0) {
-        if (this.getSurroundParent() != null) {
-            arrMove.push([this.getSurroundParent().id,arrMove.length+1]);
+    if (number_x == 0 && number_y == 0 && number_z == 0) {
+        if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
+            // arrMove.push([this.getSurroundParent().id, arrMove.length + 1]);
+            arrMove.push(this.getSurroundParent().id);
             // scene.getObjectByName(this.getSurroundParent().id).scale.set(0.5,0.5,0.5)
         }
         else if (this.getChildren()[0]) {
+            console.log("move")
             blok = this;
             while (blok.nextConnection.targetConnection) {
                 if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
-                    arrMove.push([blok.nextConnection.targetConnection.sourceBlock_.id,arrMove.length+1]);
+                    console.log("push")
+                    // arrMove.push([blok.nextConnection.targetConnection.sourceBlock_.id, arrMove.length + 1]);
+                    arrMove.push(blok.nextConnection.targetConnection.sourceBlock_.id);
                 }
                 blok = blok.nextConnection.targetConnection.sourceBlock_;
             }
@@ -380,14 +625,14 @@ Blockly.JavaScript['scale'] = function (block) {
     var number_x = block.getFieldValue('X');
 
     if (number_x == 0) {
-        if (this.getSurroundParent() != null) {
-            arrScale.push([this.getSurroundParent().id,arrScale.length+1]);
+        if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
+            arrScale.push(this.getSurroundParent().id);
         }
         else if (this.getChildren()[0]) {
             blok = this;
             while (blok.nextConnection.targetConnection) {
                 if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
-                    arrScale.push([blok.nextConnection.targetConnection.sourceBlock_.id,arrScale.length+1]);
+                    arrScale.push(blok.nextConnection.targetConnection.sourceBlock_.id);
                 }
                 blok = blok.nextConnection.targetConnection.sourceBlock_;
             }
