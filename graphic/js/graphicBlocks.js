@@ -102,11 +102,35 @@ Blockly.Blocks['move'] = {
     }
 };
 
+Blockly.Blocks['randomMove'] = {
+    init: function () {
+        this.appendDummyInput()
+            .appendField("Move")
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour(220);
+        this.setTooltip("");
+        this.setHelpUrl("");
+    }
+};
+
+Blockly.Blocks['randomScale'] = {
+    init: function () {
+        this.appendDummyInput()
+            .appendField("Scale")
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour(220);
+        this.setTooltip("");
+        this.setHelpUrl("");
+    }
+};
+
 Blockly.Blocks['scale'] = {
     init: function () {
         this.appendDummyInput()
             .appendField("Scale")
-            .appendField(new Blockly.FieldNumber(0, 0, 2, 0.1), "X");
+            .appendField(new Blockly.FieldNumber(1, 0.1, 5, 0.1), "X");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour(230);
@@ -573,7 +597,38 @@ Blockly.JavaScript['move'] = function (block) {
 
     var blok;
 
-    if (number_x == 0 && number_y == 0 && number_z == 0) {
+        if (this.getSurroundParent() != null) {
+            object = scene.getObjectByName(this.getSurroundParent().id);
+            object.position.set(number_x, number_y, number_z);
+        }
+        else if (this.getChildren()[0]) {
+            blok = this;
+            while (blok.nextConnection.targetConnection) {
+                if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
+                    object = scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id);
+                    object.position.set(number_x, number_y, number_z);
+                }
+                blok = blok.nextConnection.targetConnection.sourceBlock_;
+            }
+        }
+    // if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) { }
+    // else {
+    //     for (i = 0; i < scene.children.length; i++) {
+    //         object = scene.getObjectByName(scene.children[i].name);
+    //         object.position.set(number_x, number_y, number_z);
+    //     }
+    // }
+
+    var code = '';
+    return code;
+};
+
+Blockly.JavaScript['randomMove'] = function (block) {
+
+    // TODO: Assemble JavaScript into code variable;
+
+    var blok;
+
         if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
             // arrMove.push([this.getSurroundParent().id, arrMove.length + 1]);
             arrMove.push(this.getSurroundParent().id);
@@ -591,30 +646,6 @@ Blockly.JavaScript['move'] = function (block) {
                 blok = blok.nextConnection.targetConnection.sourceBlock_;
             }
         }
-    } else {
-
-        if (this.getSurroundParent() != null) {
-            object = scene.getObjectByName(this.getSurroundParent().id);
-            object.position.set(number_x, number_y, number_z);
-        }
-        else if (this.getChildren()[0]) {
-            blok = this;
-            while (blok.nextConnection.targetConnection) {
-                if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
-                    object = scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id);
-                    object.position.set(number_x, number_y, number_z);
-                }
-                blok = blok.nextConnection.targetConnection.sourceBlock_;
-            }
-        }
-    }
-    // if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) { }
-    // else {
-    //     for (i = 0; i < scene.children.length; i++) {
-    //         object = scene.getObjectByName(scene.children[i].name);
-    //         object.position.set(number_x, number_y, number_z);
-    //     }
-    // }
 
     var code = '';
     return code;
@@ -624,20 +655,7 @@ Blockly.JavaScript['scale'] = function (block) {
 
     var number_x = block.getFieldValue('X');
 
-    if (number_x == 0) {
-        if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
-            arrScale.push(this.getSurroundParent().id);
-        }
-        else if (this.getChildren()[0]) {
-            blok = this;
-            while (blok.nextConnection.targetConnection) {
-                if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
-                    arrScale.push(blok.nextConnection.targetConnection.sourceBlock_.id);
-                }
-                blok = blok.nextConnection.targetConnection.sourceBlock_;
-            }
-        }
-    } else {
+    
 
         if (this.getSurroundParent() != null) {
             object = scene.getObjectByName(this.getSurroundParent().id);
@@ -653,7 +671,26 @@ Blockly.JavaScript['scale'] = function (block) {
                 blok = blok.nextConnection.targetConnection.sourceBlock_;
             }
         }
-    }
+
+    var code = '';
+    return code;
+};
+
+Blockly.JavaScript['randomScale'] = function (block) {
+
+
+        if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
+            arrScale.push(this.getSurroundParent().id);
+        }
+        else if (this.getChildren()[0]) {
+            blok = this;
+            while (blok.nextConnection.targetConnection) {
+                if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
+                    arrScale.push(blok.nextConnection.targetConnection.sourceBlock_.id);
+                }
+                blok = blok.nextConnection.targetConnection.sourceBlock_;
+            }
+        }
 
     var code = '';
     return code;
