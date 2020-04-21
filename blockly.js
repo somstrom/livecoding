@@ -40,7 +40,7 @@ var element = document.getElementById("scene");
 
 function init() {
 
-    renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer = new THREE.WebGLRenderer({ alpha: true, preserveDrawingBuffer: true  });
     renderer.setClearColor( 0x000000, 0 );;
     renderer.setSize(window.innerWidth, window.innerHeight) ;
     element.appendChild(renderer.domElement);
@@ -126,6 +126,19 @@ function scale(object){
 var i;
 
 function render() {
+
+    var paintOver = true;
+
+    workspace.getAllBlocks().forEach((x)=>{
+        if(x.type == "paintOver"){
+            paintOver = false;
+        }
+    })
+
+    if(paintOver){
+        renderer.autoClearColor = true;
+        console.log("true")
+    }
 
     if (arrRotate.length > 0) {
         for (i = 0; i < arrRotate.length; i++) {

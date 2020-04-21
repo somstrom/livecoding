@@ -658,3 +658,28 @@ Blockly.JavaScript['scale'] = function (block) {
     var code = '';
     return code;
 };
+
+
+
+
+
+
+//animation
+Blockly.Blocks['paintOver'] = {
+    init: function () {
+        this.appendDummyInput()
+            .appendField("paint over");
+        this.setInputsInline(true);
+        this.setColour(100);
+        this.setTooltip("");
+        this.setHelpUrl("");
+    }
+};
+
+Blockly.JavaScript['paintOver'] = function (block) {
+    var code = ''
+    // renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
+    renderer.autoClearColor = false;
+    console.log("false")
+    return code;
+}
