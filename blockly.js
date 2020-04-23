@@ -40,9 +40,9 @@ var element = document.getElementById("scene");
 
 function init() {
 
-    renderer = new THREE.WebGLRenderer({ alpha: true, preserveDrawingBuffer: true  });
-    renderer.setClearColor( 0x000000, 0 );;
-    renderer.setSize(window.innerWidth, window.innerHeight) ;
+    renderer = new THREE.WebGLRenderer({ alpha: true, preserveDrawingBuffer: true });
+    renderer.setClearColor(0x000000, 0);;
+    renderer.setSize(window.innerWidth, window.innerHeight);
     element.appendChild(renderer.domElement);
     console.log(element);
     element.childNodes[0].style.background = 'transparent'
@@ -50,7 +50,7 @@ function init() {
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 10000);
-    controls = new THREE.OrbitControls(camera,renderer.domElement);
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
 
     // controls = new THREE.OrbitControls( camera, render.domElement );
 
@@ -87,19 +87,19 @@ var clock = new THREE.Clock();
 var time = 0;
 var radius = 1.5;
 
-function move(object,n) {
+function move(object, n, radiusNumber) {
 
+    radius = radiusNumber;
     var number = 0
-    if(n){
+    if (n) {
         number = n;
     }
 
     time = clock.getElapsedTime() * 0.5 * Math.PI;
-    console.log(Math.cos(number*1.2 + time+Math.PI*0.5))
     object.position.set(
-        Math.cos(number*0.8 + time + Math.PI * 0.5) * radius,
-        Math.sin(number*0.8 + time + Math.PI * 0.5) * radius,
-        Math.cos(number*0.8 + time + Math.PI * 0.25) * radius
+        Math.cos(number * 0.8 + time + Math.PI * 0.5) * radius,
+        Math.sin(number * 0.8 + time + Math.PI * 0.5) * radius,
+        Math.cos(number * 0.8 + time + Math.PI * 0.25) * radius
     )
 }
 
@@ -109,7 +109,7 @@ function move(object,n) {
 //     object.position.y += Math.sin(Math.PI * 0.5) * radius;
 // }
 
-function scale(object){
+function scale(object) {
     time = clock.getElapsedTime() * 0.5 * Math.PI;
     // object.scale.set(
     //     Math.sin(time + Math.PI * 0.5) * radius,
@@ -129,22 +129,21 @@ function render() {
 
     var paintOver = true;
 
-    workspace.getAllBlocks().forEach((x)=>{
-        if(x.type == "paintOver"){
+    workspace.getAllBlocks().forEach((x) => {
+        if (x.type == "paintOver") {
             paintOver = false;
         }
     })
 
-    if(paintOver){
+    if (paintOver) {
         renderer.autoClearColor = true;
-        console.log("true")
     }
 
     if (arrRotate.length > 0) {
         for (i = 0; i < arrRotate.length; i++) {
-            objektyNaScene.forEach((x)=>{
-                if(arrRotate[i] == x.name.slice(0,20)){
-                    rotate(scene.getObjectByName(x.name),x.name[20])
+            objektyNaScene.forEach((x) => {
+                if (arrRotate[i] == x.name.slice(0, 20)) {
+                    rotate(scene.getObjectByName(x.name), x.name[20])
                 }
             })
             // rotate(scene.getObjectByName(arrRotate[i]));
@@ -152,11 +151,10 @@ function render() {
     }
 
     if (arrMove.length > 0) {
-        // console.log(arrMove[0])
         for (i = 0; i < arrMove.length; i++) {
-            objektyNaScene.forEach((x)=>{
-                if(arrMove[i] == x.name.slice(0,20)){
-                    move(scene.getObjectByName(x.name),x.name[20])
+            objektyNaScene.forEach((x) => {
+                if (arrMove[i][0] == x.name.slice(0, 20)) {
+                    move(scene.getObjectByName(x.name), x.name.slice(20), arrMove[i][1]);
                 }
             })
             // move(scene.getObjectByName(arrMove[i][0]));
@@ -167,9 +165,9 @@ function render() {
     if (arrScale.length > 0) {
         // console.log(arrMove[0])
         for (i = 0; i < arrScale.length; i++) {
-            objektyNaScene.forEach((x)=>{
-                if(arrScale[i] == x.name.slice(0,20)){
-                    scale(scene.getObjectByName(x.name),)
+            objektyNaScene.forEach((x) => {
+                if (arrScale[i] == x.name.slice(0, 20)) {
+                    scale(scene.getObjectByName(x.name))
                 }
             })
             // scale(arrScale[i]);
@@ -230,42 +228,60 @@ function runCode(event) {
 
     for (i = 0; i < objektyNaScene.length; i++) {
         if (!blokyNaScene.includes(objektyNaScene[i].name) && objektyNaScene[i].name.length == 20) {
+            console.log(objektyNaScene[i].name);
+            
             scene.remove(scene.getObjectByName(objektyNaScene[i].name));
         }
     }
 
-    if(workspace.getAllBlocks().length == 0){
+    if (workspace.getAllBlocks().length == 0) {
         blokyNaScene = []
-    }else{
+    } else {
         for (i = 0; i < workspace.getAllBlocks().length; i++) {
             blokyNaScene[i] = workspace.getAllBlocks()[i].id;
             // console.log(workspace.getAllBlocks())
         }
     }
 
-    if (event.type == Blockly.Events.BLOCK_DELETE) {
+    if (event) {
+        if (event.type == Blockly.Events.BLOCK_DELETE) {
 
-        arr = [];
-        arr = event.ids;
+            arr = [];
+            arr = event.ids;
 
-        for( var i = scene.children.length - 1; i >= 0; i--) {
-            if (!blokyNaScene.includes(scene.children[i].name)) {
-                scene.remove(scene.getObjectByName(scene.children[i].name));
+            console.log(event.ids);
+
+            //chybna funkcia
+            for (var i = scene.children.length - 1; i >= 0; i--) {
+
+                for (var y = 0; y < blokyNaScene; y++) {
+                    if (!scene.children[i].includes(blokyNaScene[y])) {
+                        scene.remove(scene.getObjectByName(scene.children[i].name))
+                    }
+                }
+
+                // if (!blokyNaScene.includes(scene.children[i].name)) {
+                //     scene.remove(scene.getObjectByName(scene.children[i].name));
+                //     console.log("delete")
+                // }
             }
-        }
 
-        arr.every(e => {
-            if (arrRotate.includes(e)) {
-                arrRotate = arrRotate.filter(x => x != e);
-            }
-            if (arrMove.includes(e)){
-                arrMove = arrMove.filter(x => x != e);
-            }
-        })
+            arr.every(e => {
+                if (arrRotate.includes(e)) {
+                    arrRotate = arrRotate.filter(x => x != e);
+                }
+                if (arrMove.includes(e)) {
+                    arrMove = arrMove.filter(x => x != e);
+                }
+            })
 
-        arr.every(x => scene.remove(scene.getObjectByName(x)))
+            // arr.every(x => {
+            //     scene.remove(scene.getObjectByName(x))
+            //     console.log("arr remove")
+            // })
 
-    };
+        };
+    }
 
     // console.log(blokyNaScene);
 
@@ -281,7 +297,8 @@ function runCode(event) {
         }
     });
 
-    if (event.type) {
+    if (event) {
+
         if ((event.type == "move" && event.oldParentId)) {
             // console.log(event.oldParentId);
         } else {
@@ -295,14 +312,15 @@ function runCode(event) {
             for (i = 0; i < scene.children.length; i++) {
                 var obj = scene.getObjectByName(scene.children[i].name);
                 obj.position.set(0, 0, 0);
-                obj.scale.set(1 ,1 , 1);
+                obj.scale.set(1, 1, 1);
             }
 
             var code = Blockly.JavaScript.workspaceToCode(workspace);
             Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
             try {
-                // console.log("code: "+code)
+                console.log("code: "+code)
                 eval(code);
+                movecode = '';
             } catch (e) {
                 alert(e);
             }

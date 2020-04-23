@@ -1,4 +1,6 @@
 
+var movecode = '';
+
 //Box block
 Blockly.Blocks['box'] = {
     init: function () {
@@ -91,9 +93,9 @@ Blockly.Blocks['move'] = {
     init: function () {
         this.appendDummyInput()
             .appendField("Move")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.5), "X")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.5), "Y")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.5), "Z");
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.1), "X")
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.1), "Y")
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.1), "Z");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour(220);
@@ -176,9 +178,7 @@ Blockly.JavaScript['repeat'] = function (block) {
     var number = block.getFieldValue('number');
     var statements_name = Blockly.JavaScript.statementToCode(block, 'NAME');
 
-    var code = '';
-
-
+    var code = movecode;
 
     return code;
 };
@@ -193,15 +193,35 @@ Blockly.JavaScript['box'] = function (block) {
     var repeat_number = 1;
     var repeat_name = '';
 
+
     if (parent = this.getSurroundParent()) {
-        if (parent.type == "repeat") {
-            repeat_number = parent.inputList[0].fieldRow[1].value_;
-            repeat_name = parent.id;
+        while (parent.type == "repeat") {
+            repeat_number *= parent.inputList[0].fieldRow[1].value_;
+            repeat_name += parent.id;
+
+            if (parent.getSurroundParent()) {
+                parent = parent.getSurroundParent();
+            } else {
+                break;
+            }
+
+        }
+
+        parent = this.getSurroundParent();
+
+        while (parent.type == "repeat") {
 
             for (var i = scene.children.length - 1; i >= 0; i--) {
-                if (scene.children[i].name.includes(name) && scene.children[i].name[20] > repeat_number-1) {
+                // console.log(parseInt(scene.children[i].name.slice(20)))
+
+                if (scene.children[i].name.includes(name) && parseInt(scene.children[i].name.slice(20)) > repeat_number - 1 && scene.children[i].name.slice(20) != NaN) {
                     scene.remove(scene.getObjectByName(scene.children[i].name))
                 }
+            }
+            if (parent.getSurroundParent()) {
+                parent = parent.getSurroundParent();
+            } else {
+                break;
             }
 
         }
@@ -222,6 +242,7 @@ Blockly.JavaScript['box'] = function (block) {
         cube.name = name;
         scene.add(cube);
         cube.rotation.set(1, 1, 1);
+        console.log(name + i)
     }
 
     for (i = 1; i < repeat_number; i++) {
@@ -233,6 +254,7 @@ Blockly.JavaScript['box'] = function (block) {
             cube.name = name + i;
             scene.add(cube);
             cube.rotation.set(i + 1, i + 1, i + 1);
+            console.log(name + i);
         }
     }
 
@@ -280,14 +302,33 @@ Blockly.JavaScript['ball'] = function (block) {
     var repeat_name = '';
 
     if (parent = this.getSurroundParent()) {
-        if (parent.type == "repeat") {
-            repeat_number = parent.inputList[0].fieldRow[1].value_;
-            repeat_name = parent.id;
+        while (parent.type == "repeat") {
+            repeat_number *= parent.inputList[0].fieldRow[1].value_;
+            repeat_name += parent.id;
+
+            if (parent.getSurroundParent()) {
+                parent = parent.getSurroundParent();
+            } else {
+                break;
+            }
+
+        }
+
+        parent = this.getSurroundParent();
+
+        while (parent.type == "repeat") {
 
             for (var i = scene.children.length - 1; i >= 0; i--) {
-                if (scene.children[i].name.includes(name) && scene.children[i].name[20] > repeat_number-1) {
+                // console.log(parseInt(scene.children[i].name.slice(20)))
+
+                if (scene.children[i].name.includes(name) && parseInt(scene.children[i].name.slice(20)) > repeat_number - 1 && scene.children[i].name.slice(20) != NaN) {
                     scene.remove(scene.getObjectByName(scene.children[i].name))
                 }
+            }
+            if (parent.getSurroundParent()) {
+                parent = parent.getSurroundParent();
+            } else {
+                break;
             }
 
         }
@@ -303,11 +344,11 @@ Blockly.JavaScript['ball'] = function (block) {
     if (scene.getObjectByName(name)) { }
     else {
         var geometry = new THREE.DodecahedronBufferGeometry(1, 2);
-            var material = new THREE.MeshNormalMaterial();
-            var ball = new THREE.Mesh(geometry, material);
-            ball.name = name;
-            scene.add(ball);
-            ball.rotation.set(i + 1, i + 1, i + 1);
+        var material = new THREE.MeshNormalMaterial();
+        var ball = new THREE.Mesh(geometry, material);
+        ball.name = name;
+        scene.add(ball);
+        ball.rotation.set(i + 1, i + 1, i + 1);
     }
 
     for (i = 1; i < repeat_number; i++) {
@@ -349,7 +390,7 @@ Blockly.JavaScript['ball'] = function (block) {
 
 Blockly.JavaScript['rotate'] = function (block) {
 
-
+    var number;
     var code = '';
     var blok;
 
@@ -359,17 +400,11 @@ Blockly.JavaScript['rotate'] = function (block) {
     if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
         if (!arrRotate.includes(this.getSurroundParent().id))
             arrRotate.push(this.getSurroundParent().id);
-    } else if (this.getChildren()[0]) {
-        //rotuj objekty pod tebou
-        blok = this;
-        while (blok.nextConnection.targetConnection) {
-            // console.log(blok.nextConnection.targetConnection.sourceBlock_);
-            if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
-                if (!arrRotate.includes(blok.nextConnection.targetConnection.sourceBlock_.id))
-                    arrRotate.push(blok.nextConnection.targetConnection.sourceBlock_.id);
-            }
-            blok = blok.nextConnection.targetConnection.sourceBlock_;
-        }
+    }
+    if (this.getChildren()[0]) {
+        blok = this.nextConnection.targetConnection.sourceBlock_;
+
+        recursion(this.id, null, null, null, number, "rotate");
     }
 
     //rotuj vsekty objekty ak nemas potomka ani surroundparenta
@@ -397,14 +432,33 @@ Blockly.JavaScript['cone'] = function (block) {
     var repeat_name = '';
 
     if (parent = this.getSurroundParent()) {
-        if (parent.type == "repeat") {
-            repeat_number = parent.inputList[0].fieldRow[1].value_;
-            repeat_name = parent.id;
+        while (parent.type == "repeat") {
+            repeat_number *= parent.inputList[0].fieldRow[1].value_;
+            repeat_name += parent.id;
+
+            if (parent.getSurroundParent()) {
+                parent = parent.getSurroundParent();
+            } else {
+                break;
+            }
+
+        }
+
+        parent = this.getSurroundParent();
+
+        while (parent.type == "repeat") {
 
             for (var i = scene.children.length - 1; i >= 0; i--) {
-                if (scene.children[i].name.includes(name) && scene.children[i].name[20] > repeat_number-1) {
+                // console.log(parseInt(scene.children[i].name.slice(20)))
+
+                if (scene.children[i].name.includes(name) && parseInt(scene.children[i].name.slice(20)) > repeat_number - 1 && scene.children[i].name.slice(20) != NaN) {
                     scene.remove(scene.getObjectByName(scene.children[i].name))
                 }
+            }
+            if (parent.getSurroundParent()) {
+                parent = parent.getSurroundParent();
+            } else {
+                break;
             }
 
         }
@@ -419,18 +473,18 @@ Blockly.JavaScript['cone'] = function (block) {
 
     if (scene.getObjectByName(name)) { }
     else {
-        var geometry = new THREE.ConeGeometry(1,2);
-            var material = new THREE.MeshNormalMaterial();
-            var cone = new THREE.Mesh(geometry, material);
-            cone.name = name;
-            scene.add(cone);
-            cone.rotation.set(i + 1, i + 1, i + 1);
+        var geometry = new THREE.ConeGeometry(1, 2);
+        var material = new THREE.MeshNormalMaterial();
+        var cone = new THREE.Mesh(geometry, material);
+        cone.name = name;
+        scene.add(cone);
+        cone.rotation.set(i + 1, i + 1, i + 1);
     }
 
     for (i = 1; i < repeat_number; i++) {
         if (scene.getObjectByName(name + i)) { }
         else {
-            var geometry = new THREE.ConeGeometry(1,2);
+            var geometry = new THREE.ConeGeometry(1, 2);
             var material = new THREE.MeshNormalMaterial();
             var cone = new THREE.Mesh(geometry, material);
             cone.name = name + i;
@@ -464,14 +518,33 @@ Blockly.JavaScript['circle'] = function (block) {
     var repeat_name = '';
 
     if (parent = this.getSurroundParent()) {
-        if (parent.type == "repeat") {
-            repeat_number = parent.inputList[0].fieldRow[1].value_;
-            repeat_name = parent.id;
+        while (parent.type == "repeat") {
+            repeat_number *= parent.inputList[0].fieldRow[1].value_;
+            repeat_name += parent.id;
+
+            if (parent.getSurroundParent()) {
+                parent = parent.getSurroundParent();
+            } else {
+                break;
+            }
+
+        }
+
+        parent = this.getSurroundParent();
+
+        while (parent.type == "repeat") {
 
             for (var i = scene.children.length - 1; i >= 0; i--) {
-                if (scene.children[i].name.includes(name) && scene.children[i].name[20] > repeat_number-1) {
+                // console.log(parseInt(scene.children[i].name.slice(20)))
+
+                if (scene.children[i].name.includes(name) && parseInt(scene.children[i].name.slice(20)) > repeat_number - 1 && scene.children[i].name.slice(20) != NaN) {
                     scene.remove(scene.getObjectByName(scene.children[i].name))
                 }
+            }
+            if (parent.getSurroundParent()) {
+                parent = parent.getSurroundParent();
+            } else {
+                break;
             }
 
         }
@@ -486,18 +559,18 @@ Blockly.JavaScript['circle'] = function (block) {
 
     if (scene.getObjectByName(name)) { }
     else {
-        var geometry = new THREE.CircleGeometry(1,30);
-            var material = new THREE.MeshNormalMaterial();
-            var circle = new THREE.Mesh(geometry, material);
-            circle.name = name;
-            scene.add(circle);
-            circle.rotation.set(i + 1, i + 1, i + 1);
+        var geometry = new THREE.CircleGeometry(1, 30);
+        var material = new THREE.MeshNormalMaterial();
+        var circle = new THREE.Mesh(geometry, material);
+        circle.name = name;
+        scene.add(circle);
+        circle.rotation.set(i + 1, i + 1, i + 1);
     }
 
     for (i = 1; i < repeat_number; i++) {
         if (scene.getObjectByName(name + i)) { }
         else {
-            var geometry = new THREE.CircleGeometry(1,30);
+            var geometry = new THREE.CircleGeometry(1, 30);
             var material = new THREE.MeshNormalMaterial();
             var circle = new THREE.Mesh(geometry, material);
             circle.name = name + i;
@@ -535,129 +608,176 @@ Blockly.JavaScript['colour'] = function (block) {
     // return code;
 };
 
-Blockly.Blocks['pohyb'] = {
-    init: function () {
-        this.appendDummyInput()
-            .appendField("Pohyb")
-            .appendField(new Blockly.FieldAngle(0), "X")
-            .appendField(new Blockly.FieldAngle(0), "Y")
-            .appendField(new Blockly.FieldAngle(0), "Z");
-        Blockly.FieldAngle.CLOCKWISE = true;
-        Blockly.FieldAngle.OFFSET = 90;
-        Blockly.FieldAngle.WRAP = 180;
-        this.setPreviousStatement(true, null);
-        this.setNextStatement(true, null);
-        this.setColour(230);
-        this.setTooltip("x,y,z");
-        this.setHelpUrl("");
-    }
-};
-
-Blockly.JavaScript['pohyb'] = function (block) {
-    var angle_x = block.getFieldValue('X') / 100;
-    var angle_y = block.getFieldValue('Y') / 100;
-    var angle_z = block.getFieldValue('Z') / 100;
-
-    var blok;
-
-    if (this.getSurroundParent() != null) {
-        object = scene.getObjectByName(this.getSurroundParent().id);
-        object.position.set(angle_x, angle_y, angle_z);
-    }
-    else if (this.getChildren()[0]) {
-        blok = this;
-        while (blok.nextConnection.targetConnection) {
-            if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
-                object = scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id);
-                object.position.set(angle_x, angle_y, angle_z);
-            }
-            blok = blok.nextConnection.targetConnection.sourceBlock_;
-        }
-    }
-    if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) { }
-    else {
-        for (i = 0; i < scene.children.length; i++) {
-            object = scene.getObjectByName(scene.children[i].name);
-            object.position.set(angle_x, angle_y, angle_z);
-        }
-    }
-
-    var code = '';
-    return code;
-};
-
 Blockly.JavaScript['move'] = function (block) {
 
     var number_x = block.getFieldValue('X');
     var number_y = block.getFieldValue('Y');
     var number_z = block.getFieldValue('Z');
+    var xx = number_x;
+    var yy = number_y;
+    var zz = number_z;
+    var nx = 0;
 
+    var number = 1;
+    var code = '';
+    movecode = '';
+    var type = "move";
 
-    // TODO: Assemble JavaScript into code variable;
+    if (this.getSurroundParent()) {
+        var parent = this.getSurroundParent();
+        while (parent.type == "repeat") {
+            number *= parent.inputList[0].fieldRow[1].value_;
+
+            if (parent.getSurroundParent()) {
+                parent = parent.getSurroundParent();
+            }
+            else {
+                break;
+            }
+        }
+    }
 
     var blok;
 
-        if (this.getSurroundParent() != null) {
-            // object = scene.getObjectByName(this.getSurroundParent().id);
-            scene.children.forEach((x)=>{
-                if(x.name.includes(this.getSurroundParent().id)){
-                    scene.getObjectByName(x.name).position.set(number_x, number_y, number_z);
-                }
-            })
-            // object.position.set(number_x, number_y, number_z);
+    scene.children.forEach(y => {
+        if (y.name.includes(block.id)) {
+            nx += 1;
         }
-        if (this.getChildren()[0]) {
-            blok = this;
-            while (blok.nextConnection.targetConnection) {
-                // if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
-                    console.log("now")
-                    // object = scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id);
-                    scene.children.forEach((x)=>{
-                        console.log(x.name)
-                        if(x.name.includes(blok.nextConnection.targetConnection.sourceBlock_.id)){
-                            scene.getObjectByName(x.name).position.set(number_x, number_y, number_z);
-                        }
-                    })
-                    // object.position.set(number_x, number_y, number_z);
-                // }
-                blok = blok.nextConnection.targetConnection.sourceBlock_;
-            }
-        }
-    // if (this.getChildren()[0] || this.getSurroundParent() || this.getParent()) { }
-    // else {
-    //     for (i = 0; i < scene.children.length; i++) {
-    //         object = scene.getObjectByName(scene.children[i].name);
-    //         object.position.set(number_x, number_y, number_z);
-    //     }
-    // }
+    });
 
-    var code = '';
+    if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
+        scene.children.forEach((x) => {
+            if (x.name.includes(this.getSurroundParent().id)) {
+                // if (x.name.slice(20) % (nx / number) == 0 && x.name.slice(20) != '' && number != 1) {
+                //     xx += number_x;
+                //     zz += number_z;
+                //     yy += number_y;
+                // }
+                // movecode += "scene.getObjectByName('"+x.name+"').position.set("+xx+","+yy+","+zz+");";
+                scene.getObjectByName(x.name).position.set(number_x, number_y, number_z);
+            }
+        })
+    }
+    if (this.getChildren()[0]) {
+
+        blok = this.nextConnection.targetConnection.sourceBlock_;
+
+        movecode += "recursion('" + this.id + "'," + number_x + "," + number_y + "," + number_z + "," + number + ",'move');";
+        code += "recursion('" + this.id + "'," + number_x + "," + number_y + "," + number_z + "," + number + ",'move');";
+
+        // console.log("recursion('"+this.id+"',"+number_x+","+number_y+","+number_z+","+number+",'move');");
+
+        // recursion(this.id, number_x, number_y, number_z, number, "move");
+    }
+
     return code;
 };
 
+
+
+function recursion(blok, number_x, number_y, number_z, number, type) {
+
+    // console.log(type);
+
+    var block = workspace.getBlockById(blok);
+    if (block) {
+        if (block.nextConnection.targetConnection) {
+            block = block.nextConnection.targetConnection.sourceBlock_;
+        }
+    }
+
+    var ny = 0;
+    var nx = 0;
+    var x_num = number_x;
+    var y_num = number_y;
+    var z_num = number_z;
+    var actionType = type
+
+    // console.log("RECURSION")
+
+    // console.log(number_x)
+
+    while (block) {
+        scene.children.forEach(y => {
+            if (y.name.includes(block.id)) {
+                nx += 1;
+            }
+        });
+
+        scene.children.forEach((x) => {
+            if (x.name.includes(block.id)) {
+                if (type == "move") {
+                    if (x.name.slice(20) % (nx / number) == 0 && x.name.slice(20) != '' && number != 1) {
+                        x_num += number_x;
+                        z_num += number_z;
+                        y_num += number_y;
+                    }
+                    // console.log(x.name)
+                    scene.getObjectByName(x.name).position.set(x_num, y_num, z_num);
+                }
+                if (type == "randomMove") {
+                    arrMove.push([x.name, number]);
+                }
+                if (type == "scale") {
+                    scene.getObjectByName(x.name).scale.set(number_x, number_x, number_x);
+                }
+                if (type == "randomScale") {
+                    arrScale.push(x.name);
+                }
+                if (type == "rotate") {
+                    arrRotate.push(x.name);
+                }
+            }
+        })
+
+        // console.log(blok)
+        if (block.type == "repeat") {
+            // console.log(blok.childBlocks_)
+            block.childBlocks_.forEach(x => {
+                if (x.parentBlock_.type == "repeat") {
+                    // console.log(x)
+                    recursion(x.id, number_x, number_y, number_z, number, actionType);
+                }
+            })
+        }
+
+        if (block.nextConnection.targetConnection) {
+            block = block.nextConnection.targetConnection.sourceBlock_;
+        } else {
+            break;
+        }
+    }
+}
+
 Blockly.JavaScript['randomMove'] = function (block) {
 
-    // TODO: Assemble JavaScript into code variable;
+    var number = 1;
+
+    if (this.getSurroundParent()) {
+        var parent = this.getSurroundParent();
+        // console.log(this.getSurroundParent())
+        while (parent.type == "repeat") {
+            number *= parent.inputList[0].fieldRow[1].value_;
+
+            if (parent.getSurroundParent()) {
+                parent = parent.getSurroundParent();
+            }
+            else {
+                break;
+            }
+        }
+    }
 
     var blok;
 
-        if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
-            // arrMove.push([this.getSurroundParent().id, arrMove.length + 1]);
-            arrMove.push(this.getSurroundParent().id);
-            // scene.getObjectByName(this.getSurroundParent().id).scale.set(0.5,0.5,0.5)
-        }
-        else if (this.getChildren()[0]) {
-            console.log("move")
-            blok = this;
-            while (blok.nextConnection.targetConnection) {
-                if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
-                    console.log("push")
-                    // arrMove.push([blok.nextConnection.targetConnection.sourceBlock_.id, arrMove.length + 1]);
-                    arrMove.push(blok.nextConnection.targetConnection.sourceBlock_.id);
-                }
-                blok = blok.nextConnection.targetConnection.sourceBlock_;
-            }
-        }
+    if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
+        arrMove.push([this.getSurroundParent().id, number]);
+    }
+    if (this.getChildren()[0]) {
+        blok = this.nextConnection.targetConnection.sourceBlock_;
+
+        recursion(this.id, null, null, null, number, "randomMove");
+    }
 
     var code = '';
     return code;
@@ -667,30 +787,38 @@ Blockly.JavaScript['scale'] = function (block) {
 
     var number_x = block.getFieldValue('X');
 
-        if (this.getSurroundParent() != null) {
-            scene.children.forEach((x)=>{
-                if(x.name.includes(this.getSurroundParent().id)){
-                    scene.getObjectByName(x.name).scale.set(number_x, number_x, number_x);
-                }
-            })
-            // object = scene.getObjectByName(this.getSurroundParent().id);
-            // object.scale.set(number_x, number_x, number_x);
-        }
-        if (this.getChildren()[0]) {
-            blok = this;
-            while (blok.nextConnection.targetConnection) {
-                scene.children.forEach((x)=>{
-                    if(x.name.includes(blok.nextConnection.targetConnection.sourceBlock_.id)){
-                        scene.getObjectByName(x.name).scale.set(number_x, number_x, number_x);
-                    }
-                })
-                // if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
-                    // object = scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id);
-                    // object.scale.set(number_x, number_x, number_x);
-                // }
-                blok = blok.nextConnection.targetConnection.sourceBlock_;
+    var number = 1;
+
+    if (this.getSurroundParent()) {
+        var parent = this.getSurroundParent();
+        while (parent.type == "repeat") {
+            number *= parent.inputList[0].fieldRow[1].value_;
+
+            if (parent.getSurroundParent()) {
+                parent = parent.getSurroundParent();
+            }
+            else {
+                break;
             }
         }
+    }
+
+    var blok;
+
+    if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
+        scene.children.forEach((x) => {
+            if (x.name.includes(this.getSurroundParent().id)) {
+                scene.getObjectByName(x.name).scale.set(number_x, number_x, number_x, number);
+            }
+        })
+    }
+    if (this.getChildren()[0]) {
+        blok = this.nextConnection.targetConnection.sourceBlock_;
+
+        movecode += "recursion('" + this.id + "'," + number_x + "," + number_x + "," + number_x + "," + number + ",'scale');";
+
+        recursion(this.id, number_x, number_x, number_x, number, "scale");
+    }
 
     var code = '';
     return code;
@@ -698,19 +826,16 @@ Blockly.JavaScript['scale'] = function (block) {
 
 Blockly.JavaScript['randomScale'] = function (block) {
 
+    var number;
 
-        if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
-            arrScale.push(this.getSurroundParent().id);
-        }
-        else if (this.getChildren()[0]) {
-            blok = this;
-            while (blok.nextConnection.targetConnection) {
-                if (scene.getObjectByName(blok.nextConnection.targetConnection.sourceBlock_.id)) {
-                    arrScale.push(blok.nextConnection.targetConnection.sourceBlock_.id);
-                }
-                blok = blok.nextConnection.targetConnection.sourceBlock_;
-            }
-        }
+    if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
+        arrScale.push(this.getSurroundParent().id);
+    }
+    if (this.getChildren()[0]) {
+        blok = this.nextConnection.targetConnection.sourceBlock_;
+
+        recursion(this.id, null, null, null, number, "randomScale");
+    }
 
     var code = '';
     return code;

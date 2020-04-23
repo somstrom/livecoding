@@ -33,7 +33,7 @@ table {
   opacity: 0.6;
 }
 
-.blocklyBlockCanvas, .blocklyBlockTrash, .blocklyToolboxDiv{
+.blocklyBlockCanvas, .blocklyBlockTrash, .blocklyToolboxDiv, .blocklyFlyoutScrollbar{
   pointer-events: auto;
   opacity: 1;
 }
