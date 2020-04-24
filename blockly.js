@@ -44,7 +44,7 @@ function init() {
     renderer.setClearColor(0x000000, 0);;
     renderer.setSize(window.innerWidth, window.innerHeight);
     element.appendChild(renderer.domElement);
-    console.log(element);
+    // console.log(element);
     element.childNodes[0].style.background = 'transparent'
 
     scene = new THREE.Scene();
@@ -87,8 +87,11 @@ var clock = new THREE.Clock();
 var time = 0;
 var radius = 1.5;
 
-function move(object, n, radiusNumber) {
+function move(object, n, radiusNumber, vector) {
 
+    if (!vector) {
+        vector = new THREE.Vector3(0, 0, 0);
+    }
     radius = radiusNumber;
     var number = 0
     if (n) {
@@ -96,31 +99,30 @@ function move(object, n, radiusNumber) {
     }
 
     time = clock.getElapsedTime() * 0.5 * Math.PI;
-    object.position.set(
-        Math.cos(number * 0.8 + time + Math.PI * 0.5) * radius,
-        Math.sin(number * 0.8 + time + Math.PI * 0.5) * radius,
-        Math.cos(number * 0.8 + time + Math.PI * 0.25) * radius
-    )
+    // console.log(object);
+    if (object) {
+        object.position.set(
+            vector.x + Math.cos(number * 0.8 + time + Math.PI * 0.5) * radius,
+            vector.y + Math.sin(number * 0.8 + time + Math.PI * 0.5) * radius,
+            vector.z + Math.cos(number * 0.8 + time + Math.PI * 0.5) * radius
+        )
+    }
 }
 
-// function move(object){
-//     console.log()
-//     object.position.x += Math.cos(Math.PI * 0.5) * radius;
-//     object.position.y += Math.sin(Math.PI * 0.5) * radius;
-// }
-
-function scale(object) {
+function scale(object,x) {
     time = clock.getElapsedTime() * 0.5 * Math.PI;
-    // object.scale.set(
-    //     Math.sin(time + Math.PI * 0.5) * radius,
-    //     Math.sin(time + Math.PI * 0.5) * radius,
-    //     Math.sin(time + Math.PI * 0.5) * radius
-    // )
-    object.scale.set(
-        Math.abs(Math.sin(time + Math.PI * 0.5) * radius),
-        Math.abs(Math.sin(time + Math.PI * 0.5) * radius),
-        Math.abs(Math.sin(time + Math.PI * 0.5) * radius)
-    )
+
+    if(!x){
+        x = 1;
+    }
+
+    if (object) {
+        object.scale.set(
+            x + Math.abs(Math.sin(time + Math.PI * 0.5) * radius),
+            x + Math.abs(Math.sin(time + Math.PI * 0.5) * radius),
+            x + Math.abs(Math.sin(time + Math.PI * 0.5) * radius)
+        )
+    }
 }
 
 var i;
@@ -151,27 +153,52 @@ function render() {
     }
 
     if (arrMove.length > 0) {
-        for (i = 0; i < arrMove.length; i++) {
+
+        arrMove.forEach(m => {
+            // console.log(m[0]);
             objektyNaScene.forEach((x) => {
-                if (arrMove[i][0] == x.name.slice(0, 20)) {
-                    move(scene.getObjectByName(x.name), x.name.slice(20), arrMove[i][1]);
-                }
+                //         if (arrMove[i][0] == x.name.slice(0, 20)) {
+                // console.log(m[2]);
+                move(scene.getObjectByName(m[0]), m[0].slice(20), m[1], m[2]);
             })
-            // move(scene.getObjectByName(arrMove[i][0]));
-            // move(arrMove[i]);
-        }
+        })
+
+        // for (i = 0; i < arrMove.length; i++) {
+        //     objektyNaScene.forEach((x) => {
+        //         if (arrMove[i][0] == x.name.slice(0, 20)) {
+        //             // console.log(arrMove[i][2]);
+        //             // console.log(x.name.slice(0,20));
+        //             // console.log(arrMove[i][1]);
+        //             console.log(arrMove);
+        //             move(scene.getObjectByName(x.name), x.name.slice(20), arrMove[i][1], arrMove[i][2]);
+        //         }
+        //     })
+        // move(scene.getObjectByName(arrMove[i][0]));
+        // move(arrMove[i]);
+        // }
     }
 
     if (arrScale.length > 0) {
         // console.log(arrMove[0])
-        for (i = 0; i < arrScale.length; i++) {
+
+        arrScale.forEach(m => {
+            // console.log(m[0]);
             objektyNaScene.forEach((x) => {
-                if (arrScale[i] == x.name.slice(0, 20)) {
-                    scale(scene.getObjectByName(x.name))
-                }
+                //         if (arrMove[i][0] == x.name.slice(0, 20)) {
+                // console.log(m[2]);
+                // move(scene.getObjectByName(m[0]), m[0].slice(20), m[1], m[2]);
+                scale(scene.getObjectByName(m[0]),m[2])
             })
-            // scale(arrScale[i]);
-        }
+        })
+
+        // for (i = 0; i < arrScale.length; i++) {
+        //     objektyNaScene.forEach((x) => {
+        //         if (arrScale[i] == x.name.slice(0, 20)) {
+        //             scale(scene.getObjectByName(x.name))
+        //         }
+        //     })
+        //     // scale(arrScale[i]);
+        // }
     }
 
     // findPeaks();
@@ -229,7 +256,6 @@ function runCode(event) {
     for (i = 0; i < objektyNaScene.length; i++) {
         if (!blokyNaScene.includes(objektyNaScene[i].name) && objektyNaScene[i].name.length == 20) {
             console.log(objektyNaScene[i].name);
-            
             scene.remove(scene.getObjectByName(objektyNaScene[i].name));
         }
     }
@@ -318,7 +344,7 @@ function runCode(event) {
             var code = Blockly.JavaScript.workspaceToCode(workspace);
             Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
             try {
-                // console.log("code: "+code)
+                console.log("code: " + code)
                 eval(code);
                 movecode = '';
             } catch (e) {

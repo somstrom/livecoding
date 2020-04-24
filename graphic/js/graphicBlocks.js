@@ -267,7 +267,7 @@ Blockly.JavaScript['box'] = function (block) {
     //     + "scene.add(cube);"
     //     + "cube.rotation.set(0.5,1,0);}";
 
-    return code;
+    return movecode;
 };
 
 // Blockly.JavaScript['box'] = function (block) {
@@ -645,29 +645,14 @@ Blockly.JavaScript['move'] = function (block) {
     });
 
     if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
-        scene.children.forEach((x) => {
-            if (x.name.includes(this.getSurroundParent().id)) {
-                // if (x.name.slice(20) % (nx / number) == 0 && x.name.slice(20) != '' && number != 1) {
-                //     xx += number_x;
-                //     zz += number_z;
-                //     yy += number_y;
-                // }
-                // movecode += "scene.getObjectByName('"+x.name+"').position.set("+xx+","+yy+","+zz+");";
-                // scene.getObjectByName(x.name).poswaition.set(number_x, number_y, number_z);
-                movecode += "scene.getObjectByName('"+x.name+"').position.set("+number_x+","+number_y+","+number_z+");";
-            }
-        })
+
+        movecode += "scene.children.forEach((x) => {if(x.name.includes('"+this.getSurroundParent().id+"')){movecode +=scene.getObjectByName(x.name).position.set("+number_x+","+number_y+","+number_z+") }});"
+
     }
     if (this.getChildren()[0]) {
 
-        blok = this.nextConnection.targetConnection.sourceBlock_;
-
         movecode += "recursion('" + this.id + "'," + number_x + "," + number_y + "," + number_z + "," + number + ",'move');";
-        code += "recursion('" + this.id + "'," + number_x + "," + number_y + "," + number_z + "," + number + ",'move');";
 
-        // console.log("recursion('"+this.id+"',"+number_x+","+number_y+","+number_z+","+number+",'move');");
-
-        // recursion(this.id, number_x, number_y, number_z, number, "move");
     }
 
     return code;
@@ -712,25 +697,37 @@ function recursion(blok, number_x, number_y, number_z, number, type) {
                         z_num += number_z;
                         y_num += number_y;
                     }
-                    console.log(x.name + ", "+nx);
+                    // console.log(x.name + ", "+nx);
+                    arrMove.forEach(k => {
+                        if(k[0] == x.name){
+                            console.log(x_num,y_num,z_num);
+                            k[2] = new THREE.Vector3(x_num,y_num,z_num);
+                        }
+                    })
                     scene.getObjectByName(x.name).position.set(x_num, y_num, z_num);
                 }
                 if (type == "randomMove") {
                     arrMove.push([x.name, number]);
                 }
                 if (type == "scale") {
+
+                    arrScale.forEach(k => {
+                        if(k[0] == x.name){
+                            console.log(x_num,y_num,z_num);
+                            k[2] = number_x;
+                        }
+                    })
+
                     scene.getObjectByName(x.name).scale.set(number_x, number_x, number_x);
                 }
                 if (type == "randomScale") {
-                    arrScale.push(x.name);
+                    arrScale.push([x.name, number]);
                 }
                 if (type == "rotate") {
                     arrRotate.push(x.name);
                 }
             }
         })
-
-        
 
         // console.log(blok)
         if (block.type == "repeat") {
@@ -761,7 +758,7 @@ Blockly.JavaScript['randomMove'] = function (block) {
 
     if (this.getSurroundParent()) {
         var parent = this.getSurroundParent();
-        // console.log(this.getSurroundParent())
+
         while (parent.type == "repeat") {
             number *= parent.inputList[0].fieldRow[1].value_;
 
@@ -774,15 +771,15 @@ Blockly.JavaScript['randomMove'] = function (block) {
         }
     }
 
-    var blok;
 
     if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
-        arrMove.push([this.getSurroundParent().id, number]);
+        movecode += "scene.children.forEach((x) => {if(x.name.includes('"+this.getSurroundParent().id+"')){movecode +=arrMove.push([x.name, "+number+"]); }})"
     }
     if (this.getChildren()[0]) {
-        blok = this.nextConnection.targetConnection.sourceBlock_;
 
-        recursion(this.id, null, null, null, number, "randomMove");
+        movecode += "recursion('"+this.id+"',0,0,0,"+number+",'randomMove');";
+
+        // recursion(this.id, null, null, null, number, "randomMove");
     }
 
     var code = '';
@@ -809,18 +806,11 @@ Blockly.JavaScript['scale'] = function (block) {
         }
     }
 
-    var blok;
-
     if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
-        scene.children.forEach((x) => {
-            if (x.name.includes(this.getSurroundParent().id)) {
-                // scene.getObjectByName(x.name).scale.set(number_x, number_x, number_x, number);
-                movecode += "scene.getObjectByName('"+x.name+"').scale.set("+number_x+", "+number_x+", "+number_x+", "+number+");";
-            }
-        })
+        // movecode += "scene.children.forEach((x) => {if(x.name.includes('"+this.getSurroundParent().id+"')){movecode +=scene.getObjectByName(x.name).scale.set("+number_x+","+number_x+","+number_x+") }});"
+        movecode += "recursiveScale('"+this.getSurroundParent().id+"',"+number_x+");";
     }
     if (this.getChildren()[0]) {
-        blok = this.nextConnection.targetConnection.sourceBlock_;
 
         movecode += "recursion('" + this.id + "'," + number_x + "," + number_x + "," + number_x + "," + number + ",'scale');";
 
@@ -831,17 +821,48 @@ Blockly.JavaScript['scale'] = function (block) {
     return code;
 };
 
+function recursiveScale(ID,num_x){
+    scene.children.forEach((x) => {
+        if (x.name.includes(ID)) {
+
+                arrScale.forEach(k => {
+                    if(k[0] == x.name){
+                        k[2] = num_x;
+                    }
+                })
+
+                scene.getObjectByName(x.name).scale.set(num_x, num_x, num_x);
+        }
+    })
+}
+
 Blockly.JavaScript['randomScale'] = function (block) {
 
-    var number;
+    var number = 1;
+
+    if (this.getSurroundParent()) {
+        var parent = this.getSurroundParent();
+
+        while (parent.type == "repeat") {
+            number *= parent.inputList[0].fieldRow[1].value_;
+
+            if (parent.getSurroundParent()) {
+                parent = parent.getSurroundParent();
+            }
+            else {
+                break;
+            }
+        }
+    }
 
     if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
-        arrScale.push(this.getSurroundParent().id);
+        movecode += "scene.children.forEach((x) => {if(x.name.includes('"+this.getSurroundParent().id+"')){movecode +=arrScale.push([x.name, "+number+"]); }})"
     }
     if (this.getChildren()[0]) {
-        blok = this.nextConnection.targetConnection.sourceBlock_;
 
-        recursion(this.id, null, null, null, number, "randomScale");
+        movecode += "recursion('"+this.id+"',0,0,0,"+number+",'randomScale');";
+
+        // recursion(this.id, null, null, null, number, "randomScale");
     }
 
     var code = '';
