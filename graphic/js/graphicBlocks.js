@@ -254,7 +254,6 @@ Blockly.JavaScript['box'] = function (block) {
             cube.name = name + i;
             scene.add(cube);
             cube.rotation.set(i + 1, i + 1, i + 1);
-            console.log(name + i);
         }
     }
 
@@ -620,7 +619,7 @@ Blockly.JavaScript['move'] = function (block) {
 
     var number = 1;
     var code = '';
-    movecode = '';
+    // movecode = '';
     var type = "move";
 
     if (this.getSurroundParent()) {
@@ -654,7 +653,8 @@ Blockly.JavaScript['move'] = function (block) {
                 //     yy += number_y;
                 // }
                 // movecode += "scene.getObjectByName('"+x.name+"').position.set("+xx+","+yy+","+zz+");";
-                scene.getObjectByName(x.name).position.set(number_x, number_y, number_z);
+                // scene.getObjectByName(x.name).poswaition.set(number_x, number_y, number_z);
+                movecode += "scene.getObjectByName('"+x.name+"').position.set("+number_x+","+number_y+","+number_z+");";
             }
         })
     }
@@ -680,11 +680,11 @@ function recursion(blok, number_x, number_y, number_z, number, type) {
     // console.log(type);
 
     var block = workspace.getBlockById(blok);
-    if (block) {
-        if (block.nextConnection.targetConnection) {
-            block = block.nextConnection.targetConnection.sourceBlock_;
-        }
-    }
+    // if (block) {
+    //     if (block.nextConnection.targetConnection) {
+    //         block = block.nextConnection.targetConnection.sourceBlock_;
+    //     }
+    // }
 
     var ny = 0;
     var nx = 0;
@@ -712,7 +712,7 @@ function recursion(blok, number_x, number_y, number_z, number, type) {
                         z_num += number_z;
                         y_num += number_y;
                     }
-                    // console.log(x.name)
+                    console.log(x.name + ", "+nx);
                     scene.getObjectByName(x.name).position.set(x_num, y_num, z_num);
                 }
                 if (type == "randomMove") {
@@ -730,6 +730,8 @@ function recursion(blok, number_x, number_y, number_z, number, type) {
             }
         })
 
+        
+
         // console.log(blok)
         if (block.type == "repeat") {
             // console.log(blok.childBlocks_)
@@ -743,6 +745,10 @@ function recursion(blok, number_x, number_y, number_z, number, type) {
 
         if (block.nextConnection.targetConnection) {
             block = block.nextConnection.targetConnection.sourceBlock_;
+            x_num = number_x;
+            y_num = number_y;
+            z_num = number_z;
+            nx = 0;
         } else {
             break;
         }
@@ -808,7 +814,8 @@ Blockly.JavaScript['scale'] = function (block) {
     if (this.getSurroundParent() != null && this.getSurroundParent().type != "repeat") {
         scene.children.forEach((x) => {
             if (x.name.includes(this.getSurroundParent().id)) {
-                scene.getObjectByName(x.name).scale.set(number_x, number_x, number_x, number);
+                // scene.getObjectByName(x.name).scale.set(number_x, number_x, number_x, number);
+                movecode += "scene.getObjectByName('"+x.name+"').scale.set("+number_x+", "+number_x+", "+number_x+", "+number+");";
             }
         })
     }
@@ -817,7 +824,7 @@ Blockly.JavaScript['scale'] = function (block) {
 
         movecode += "recursion('" + this.id + "'," + number_x + "," + number_x + "," + number_x + "," + number + ",'scale');";
 
-        recursion(this.id, number_x, number_x, number_x, number, "scale");
+        // recursion(this.id, number_x, number_x, number_x, number, "scale");
     }
 
     var code = '';

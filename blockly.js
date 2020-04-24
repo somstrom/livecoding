@@ -254,16 +254,16 @@ function runCode(event) {
             //chybna funkcia
             for (var i = scene.children.length - 1; i >= 0; i--) {
 
-                for (var y = 0; y < blokyNaScene; y++) {
-                    if (!scene.children[i].includes(blokyNaScene[y])) {
-                        scene.remove(scene.getObjectByName(scene.children[i].name))
-                    }
-                }
-
-                // if (!blokyNaScene.includes(scene.children[i].name)) {
-                //     scene.remove(scene.getObjectByName(scene.children[i].name));
-                //     console.log("delete")
+                // for (var y = 0; y < blokyNaScene; y++) {
+                //     if (!scene.children[i].includes(blokyNaScene[y])) {
+                //         scene.remove(scene.getObjectByName(scene.children[i].name))
+                //     }
                 // }
+
+                if (!blokyNaScene.includes(scene.children[i].name)) {
+                    scene.remove(scene.getObjectByName(scene.children[i].name));
+                    console.log("delete")
+                }
             }
 
             arr.every(e => {
@@ -318,7 +318,7 @@ function runCode(event) {
             var code = Blockly.JavaScript.workspaceToCode(workspace);
             Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
             try {
-                console.log("code: "+code)
+                // console.log("code: "+code)
                 eval(code);
                 movecode = '';
             } catch (e) {
